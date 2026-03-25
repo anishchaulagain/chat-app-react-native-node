@@ -21,6 +21,12 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/admin', adminRoutes);
