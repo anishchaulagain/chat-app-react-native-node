@@ -6,18 +6,19 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, public_key } = req.body;
+    const { email, password, public_key, private_key } = req.body;
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: 'User already exists' });
     }
     const password_hash = await hashPassword(password);
-    user = await User.create({ email, password_hash, public_key });
+    user = await User.create({ email, password_hash, public_key, private_key });
     
     res.status(201).json({
       _id: user._id,
       email: user.email,
       public_key: user.public_key,
+      private_key: user.private_key,
       token: generateToken(user._id)
     });
   } catch (error) {
@@ -38,6 +39,7 @@ router.post('/login', async (req, res) => {
       _id: user._id,
       email: user.email,
       public_key: user.public_key,
+      private_key: user.private_key,
       token: generateToken(user._id)
     });
   } catch (error) {

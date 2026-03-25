@@ -11,13 +11,16 @@ const useAuthStore = create((set, get) => ({
 
   setPrivateKey: (key) => set({ privateKey: key }),
 
-  login: async (email, password) => {
+    login: async (email, password) => {
     try {
       const res = await axios.post(`${config.API_URL}/api/auth/login`, { email, password });
-      const { token, _id, public_key } = res.data;
+      const { token, _id, public_key, private_key } = res.data;
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('user', JSON.stringify({ _id, email, public_key }));
-      set({ token, user: { _id, email, public_key }, isLoading: false });
+      if (private_key) {
+        await AsyncStorage.setItem('privateKey', private_key);
+      }
+      set({ token, user: { _id, email, public_key }, privateKey: private_key, isLoading: false });
       return { success: true };
     } catch (err) {
       return { success: false, message: err.response?.data?.message || 'Login failed' };

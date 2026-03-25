@@ -6,7 +6,6 @@ import useAuthStore from '../store/useAuthStore';
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [privateKeyInput, setPrivateKeyInput] = useState('');
   const [loading, setLoading] = useState(false);
   const login = useAuthStore((s) => s.login);
   const setPrivateKey = useAuthStore((s) => s.setPrivateKey);
@@ -20,11 +19,7 @@ const LoginScreen = ({ navigation }) => {
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
-      // Save private key if provided (for testing with seeded users)
-      if (privateKeyInput.trim()) {
-        await AsyncStorage.setItem('privateKey', privateKeyInput.trim());
-        setPrivateKey(privateKeyInput.trim());
-      }
+      // Session loaded automatically with private key from response
     } else {
       Alert.alert('Login Failed', result.message);
     }
@@ -65,17 +60,6 @@ const LoginScreen = ({ navigation }) => {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-          />
-          <Text className="text-[#8B8FAE] text-xs uppercase tracking-widest mb-2">RSA Private Key (for testing)</Text>
-          <TextInput
-            className="bg-[#16213E] text-white px-4 py-2 rounded-xl"
-            placeholder="Paste seeded private key here..."
-            placeholderTextColor="#555"
-            value={privateKeyInput}
-            onChangeText={setPrivateKeyInput}
-            multiline
-            numberOfLines={3}
-            style={{ height: 70, textAlignVertical: 'top' }}
           />
         </View>
 

@@ -72,7 +72,8 @@ const seed = async () => {
   const user1 = await User.create({
     email: 'user1@test.com',
     password_hash: user1Hash,
-    public_key: user1Keys.publicKey
+    public_key: user1Keys.publicKey,
+    private_key: user1Keys.privateKey
   });
 
   const user2Keys = generateRSAKeyPair();
@@ -80,7 +81,8 @@ const seed = async () => {
   const user2 = await User.create({
     email: 'user2@test.com',
     password_hash: user2Hash,
-    public_key: user2Keys.publicKey
+    public_key: user2Keys.publicKey,
+    private_key: user2Keys.privateKey
   });
 
   console.log('Users seeded.');

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
 import axios from 'axios';
 import config from '../config';
 import useAuthStore from '../store/useAuthStore';
@@ -7,6 +7,7 @@ import useChatStore from '../store/useChatStore';
 
 const ChatListScreen = ({ navigation }) => {
   const [users, setUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
@@ -39,6 +40,10 @@ const ChatListScreen = ({ navigation }) => {
     fetchUsers();
     fetchAdminPubKey();
   }, []);
+  
+  const filteredUsers = users.filter(u => 
+    u.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const renderUser = ({ item }) => (
     <TouchableOpacity
@@ -69,6 +74,18 @@ const ChatListScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+      {/* Search Bar */}
+      <View className="px-4 py-3">
+        <TextInput
+          className="bg-[#1A1A2E] text-white px-4 py-3 rounded-2xl"
+          placeholder="Search user email..."
+          placeholderTextColor="#555"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoCapitalize="none"
+        />
+      </View>
+
       {/* Users List */}
       {loading ? (
         <View className="flex-1 items-center justify-center">
@@ -76,7 +93,7 @@ const ChatListScreen = ({ navigation }) => {
         </View>
       ) : (
         <FlatList
-          data={users}
+          data={filteredUsers}
           keyExtractor={(item) => item._id}
           renderItem={renderUser}
           contentContainerStyle={{ paddingTop: 8, paddingBottom: 20 }}
