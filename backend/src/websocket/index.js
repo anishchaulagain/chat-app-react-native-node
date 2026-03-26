@@ -39,34 +39,35 @@ const setupWebSocket = (wss) => {
               expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days TTL
             };
 
-            let savedMessage = messageData;
+            let broadcastMessage = { ...messageData };
+            // Assign a temporary ID for instant broadcast
+            broadcastMessage._id = Math.random().toString(36).substring(7);
 
-            if (mode === 'SECURE') {
-              // Persistent mode
-              // Save to DB
-              const msgDoc = await Message.create(messageData);
-              savedMessage = msgDoc.toObject();
-            } else if (mode === 'PRIVATE') {
-              // Ephemeral mode
-              // Add a fake random id for client list rendering
-              savedMessage._id = Math.random().toString(36).substring(7);
-              savedMessage.isPrivate = true;
+            if (mode === 'PRIVATE') {
+              broadcastMessage.isPrivate = true;
             }
 
-            // Broadcast to receiver if active
+            // Broadcast to receiver IMMEDIATELY if active
             const receiverWs = clients.get(receiver_id);
             if (receiverWs && receiverWs.readyState === 1) { // OPEN
               receiverWs.send(JSON.stringify({
                 type: 'NEW_MESSAGE',
-                payload: savedMessage
+                payload: broadcastMessage
               }));
             }
             
-            // Send Ack to sender
+            // Send Ack to sender IMMEDIATELY
             ws.send(JSON.stringify({
               type: 'MESSAGE_SENT',
-              payload: savedMessage
+              payload: broadcastMessage
             }));
+
+            // Save to DB asynchronously in the background
+            if (mode === 'SECURE') {
+              Message.create(messageData).catch(err => {
+                console.error('Failed to save asynchronous message to DB:', err);
+              });
+            }
           }
         } catch (error) {
           console.error('WS MSG Error:', error);
