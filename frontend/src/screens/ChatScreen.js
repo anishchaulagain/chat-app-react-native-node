@@ -196,28 +196,37 @@ const ChatScreen = ({ route }) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-[#0F0E17]"
+      className="flex-1 bg-[#f8f9ff]"
     >
       {/* Header */}
-      <View className="bg-[#1A1A2E] px-6 pt-14 pb-4">
-        <Text className="text-white text-lg font-bold">{receiverEmail}</Text>
-        <View className="flex-row items-center mt-2">
-          {/* Mode Toggle */}
+      <View className="bg-white px-6 pt-16 pb-4 shadow-sm">
+        <View className="flex-row items-center">
+          <View className="w-10 h-10 rounded-full bg-[#eff4ff] items-center justify-center mr-3 border border-[#dee0ff]">
+            <Text className="text-[#24389c] font-bold">{receiverEmail[0].toUpperCase()}</Text>
+          </View>
+          <View className="flex-1">
+            <Text className="text-[#0d1c2e] text-lg font-bold" numberOfLines={1}>{receiverEmail}</Text>
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+              <Text className="text-[#757684] text-[10px] font-medium uppercase tracking-wider">End-to-End Encrypted</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Mode Toggle Bar */}
+        <View className="flex-row items-center mt-4 bg-[#f8f9ff] p-1 rounded-xl border border-[#dee0ff]">
           <TouchableOpacity
-            className={`px-3 py-1 rounded-full mr-2 ${mode === 'SECURE' ? 'bg-[#6C63FF]' : 'bg-[#16213E]'}`}
+            className={`flex-1 py-2 rounded-lg items-center ${mode === 'SECURE' ? 'bg-white shadow-sm' : ''}`}
             onPress={() => setMode('SECURE')}
           >
-            <Text className="text-white text-xs">🔒 Secure</Text>
+            <Text className={`${mode === 'SECURE' ? 'text-[#24389c] font-bold' : 'text-[#757684]'} text-xs`}>🔒 SECURE</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`px-3 py-1 rounded-full ${mode === 'PRIVATE' ? 'bg-[#E94560]' : 'bg-[#16213E]'}`}
+            className={`flex-1 py-2 rounded-lg items-center ${mode === 'PRIVATE' ? 'bg-white shadow-sm' : ''}`}
             onPress={() => setMode('PRIVATE')}
           >
-            <Text className="text-white text-xs">🔥 Private</Text>
+            <Text className={`${mode === 'PRIVATE' ? 'text-[#e91e63] font-bold' : 'text-[#757684]'} text-xs`}>🔥 PRIVATE</Text>
           </TouchableOpacity>
-          <Text className="text-[#8B8FAE] text-[10px] ml-auto">
-            {mode === 'SECURE' ? 'Messages stored for 7 days' : 'Messages are ephemeral'}
-          </Text>
         </View>
       </View>
 
@@ -226,26 +235,60 @@ const ChatScreen = ({ route }) => {
         ref={flatListRef}
         data={messages}
         keyExtractor={(item, index) => item._id?.toString() || index.toString()}
-        renderItem={renderMessage}
-        contentContainerStyle={{ paddingVertical: 10 }}
+        renderItem={({ item }) => {
+          const isSender = item.isSender;
+          return (
+            <View className={`mx-4 my-1 ${isSender ? 'items-end' : 'items-start'}`}>
+              <View
+                className={`max-w-[85%] px-4 py-3 rounded-2xl ${
+                  isSender 
+                    ? 'bg-[#24389c] rounded-tr-none' 
+                    : 'bg-white border border-[#eff4ff] rounded-tl-none shadow-sm'
+                }`}
+              >
+                <Text className={`${isSender ? 'text-white' : 'text-[#0d1c2e]'} text-[15px] leading-5`}>
+                  {item.text}
+                </Text>
+                <View className="flex-row items-center mt-1 justify-end">
+                  {item.isPrivate && (
+                    <Text className="text-[9px] text-pink-400 font-bold mr-2 uppercase">Ephemeral</Text>
+                  )}
+                  {!item.isPrivate && item.expires_at && (
+                    <Text className={`${isSender ? 'text-indigo-200' : 'text-[#757684]'} text-[9px] font-medium`}>
+                      Expires: {getTimeRemaining(item.expires_at)}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          );
+        }}
+        contentContainerStyle={{ paddingVertical: 20 }}
         onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
       />
 
       {/* Input */}
-      <View className="bg-[#1A1A2E] px-4 py-3 flex-row items-center">
-        <TextInput
-          className="flex-1 bg-[#16213E] text-white px-4 py-3 rounded-2xl mr-3"
-          placeholder="Type a message..."
-          placeholderTextColor="#555"
-          value={text}
-          onChangeText={setText}
-        />
-        <TouchableOpacity
-          className="bg-[#6C63FF] w-12 h-12 rounded-full items-center justify-center"
-          onPress={handleSend}
-        >
-          <Text className="text-white text-lg">↑</Text>
-        </TouchableOpacity>
+      <View className="bg-white px-4 pt-3 pb-8 shadow-2xl border-t border-[#dee0ff]">
+        <View className="flex-row items-center bg-[#f8f9ff] rounded-2xl px-4 border border-[#dee0ff]">
+          <TextInput
+            className="flex-1 text-[#0d1c2e] py-3 text-base"
+            placeholder="Type your message..."
+            placeholderTextColor="#757684"
+            value={text}
+            onChangeText={setText}
+            multiline
+          />
+          <TouchableOpacity
+            className={`w-10 h-10 rounded-full items-center justify-center ${text.trim() ? 'bg-[#24389c]' : 'bg-[#dee0ff]'}`}
+            onPress={handleSend}
+            disabled={!text.trim()}
+          >
+            <Text className="text-white text-xl">↑</Text>
+          </TouchableOpacity>
+        </View>
+        <Text className="text-[#757684] text-[9px] text-center mt-2 uppercase tracking-tighter">
+          {mode === 'SECURE' ? 'Messages are stored for 7 days' : 'Messages will vanish after closing chat'}
+        </Text>
       </View>
     </KeyboardAvoidingView>
   );

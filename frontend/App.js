@@ -26,11 +26,11 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <StatusBar barStyle="light-content" backgroundColor="#0F0E17" />
+      <StatusBar barStyle="dark-content" backgroundColor="#f8f9ff" />
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#0F0E17' },
+          contentStyle: { backgroundColor: '#f8f9ff' },
           animation: 'slide_from_right',
         }}
       >

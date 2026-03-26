@@ -88,22 +88,22 @@ const AdminScreen = () => {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 bg-[#0F0E17] justify-center px-8"
+        className="flex-1 bg-[#f8f9ff] justify-center px-8"
       >
-        <View className="items-center mb-10">
-          <View className="w-16 h-16 rounded-2xl bg-[#E94560] items-center justify-center mb-4">
-            <Text className="text-white text-2xl">🛡️</Text>
+        <View className="items-center mb-12">
+          <View className="w-20 h-20 rounded-3xl bg-[#ffebee] items-center justify-center mb-6 border border-[#ffcdd2]">
+            <Text className="text-3xl">🛡️</Text>
           </View>
-          <Text className="text-white text-2xl font-bold">Admin Console</Text>
-          <Text className="text-[#8B8FAE] text-sm mt-2">Enter your 16-digit master key</Text>
+          <Text className="text-[#0d1c2e] text-3xl font-bold tracking-tight">Admin Console</Text>
+          <Text className="text-[#454652] text-base mt-2 text-center">Enter your 16-digit master key to decrypt the vault</Text>
         </View>
 
-        <View className="bg-[#1A1A2E] rounded-2xl p-6 mb-6">
-          <Text className="text-[#8B8FAE] text-xs uppercase tracking-widest mb-2">Master Key</Text>
+        <View className="bg-white rounded-2xl p-6 mb-8 border border-[#dee0ff] shadow-sm">
+          <Text className="text-[#0d1c2e] text-sm font-semibold mb-4 text-center uppercase tracking-widest">Master Key</Text>
           <TextInput
-            className="bg-[#16213E] text-white text-center text-lg px-4 py-4 rounded-xl tracking-[4px]"
+            className="bg-[#f8f9ff] text-[#0d1c2e] text-center text-3xl font-light px-4 py-5 rounded-2xl tracking-[6px] border border-[#dee0ff] focus:border-[#e91e63]"
             placeholder="••••••••••••••••"
-            placeholderTextColor="#555"
+            placeholderTextColor="#c5c5d4"
             value={masterKey}
             onChangeText={setMasterKey}
             maxLength={16}
@@ -113,35 +113,76 @@ const AdminScreen = () => {
         </View>
 
         <TouchableOpacity
-          className="bg-[#E94560] py-4 rounded-xl items-center"
+          className="bg-[#e91e63] py-4 rounded-xl items-center shadow-lg shadow-pink-100"
           onPress={handleUnlock}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-white font-bold text-base">Unlock & Decrypt</Text>
+            <Text className="text-white font-bold text-lg">Unlock & Decrypt</Text>
           )}
+        </TouchableOpacity>
+        
+        <TouchableOpacity className="mt-8 items-center" onPress={() => Alert.alert('Security Info', 'All decryption happens locally on your device.')}>
+          <Text className="text-[#757684] text-xs font-medium">Zero-Knowledge Decryption System</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     );
   }
 
   return (
-    <View className="flex-1 bg-[#0F0E17]">
-      <View className="bg-[#1A1A2E] px-6 pt-14 pb-4">
-        <Text className="text-white text-xl font-bold">🛡️ Admin Console</Text>
-        <Text className="text-[#8B8FAE] text-xs mt-1">{messages.length} messages decrypted</Text>
+    <View className="flex-1 bg-[#f8f9ff]">
+      <View className="bg-white px-6 pt-16 pb-6 border-b border-[#dee0ff]">
+        <View className="flex-row justify-between items-center">
+          <View>
+            <Text className="text-[#0d1c2e] text-2xl font-bold tracking-tight">Shield Dashboard</Text>
+            <Text className="text-[#e91e63] text-xs font-bold mt-1 uppercase tracking-wider">{messages.length} Active Records Unlocked</Text>
+          </View>
+          <TouchableOpacity onPress={() => setUnlocked(false)} className="w-10 h-10 rounded-full bg-[#eff4ff] items-center justify-center border border-[#dee0ff]">
+            <Text className="text-[#24389c] text-xs font-bold">GT</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
         data={messages}
         keyExtractor={(item, index) => item._id?.toString() || index.toString()}
-        renderItem={renderMessage}
-        contentContainerStyle={{ paddingVertical: 10 }}
+        renderItem={({ item }) => {
+          const isExpired = new Date(item.expires_at) < new Date();
+          return (
+            <View className="bg-white mx-6 my-2 p-5 rounded-2xl border border-[#eff4ff] shadow-sm">
+              <View className="flex-row justify-between items-center mb-3">
+                <View className="flex-row items-center">
+                  <View className="w-8 h-8 rounded-lg bg-[#eff4ff] items-center justify-center mr-2">
+                    <Text className="text-[#24389c] text-xs font-bold">{item.senderEmail[0].toUpperCase()}</Text>
+                  </View>
+                  <Text className="text-[#0d1c2e] text-xs font-bold">{item.senderEmail.split('@')[0]}</Text>
+                  <Text className="text-[#757684] text-xs mx-2">→</Text>
+                  <Text className="text-[#0d1c2e] text-xs font-bold">{item.receiverEmail.split('@')[0]}</Text>
+                </View>
+                {isExpired && (
+                  <View className="bg-[#ffebee] px-2 py-1 rounded-md border border-[#ffcdd2]">
+                    <Text className="text-[#e91e63] text-[9px] font-bold uppercase">Expired</Text>
+                  </View>
+                )}
+              </View>
+              <Text className="text-[#0d1c2e] text-[15px] leading-5">{item.text}</Text>
+              <View className="flex-row justify-between items-center mt-4">
+                <Text className="text-[#757684] text-[10px] font-medium font-mono">
+                  ID: {item._id.substring(0, 8)}...
+                </Text>
+                <Text className="text-[#757684] text-[10px]">
+                  {new Date(item.created_at).toLocaleString()}
+                </Text>
+              </View>
+            </View>
+          );
+        }}
+        contentContainerStyle={{ paddingVertical: 15 }}
         ListEmptyComponent={
-          <View className="items-center mt-20">
-            <Text className="text-[#8B8FAE]">No messages found</Text>
+          <View className="items-center mt-20 px-10">
+            <Text className="text-[#757684] text-center">No messages have been intercepted or decrypted.</Text>
           </View>
         }
       />

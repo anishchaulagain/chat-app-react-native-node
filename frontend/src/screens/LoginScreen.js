@@ -28,60 +28,75 @@ const LoginScreen = ({ navigation }) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-[#0F0E17]"
+      className="flex-1 bg-[#f8f9ff]"
     >
       <View className="flex-1 justify-center px-8">
         {/* Header */}
-        <View className="items-center mb-10">
-          <View className="w-16 h-16 rounded-2xl bg-[#6C63FF] items-center justify-center mb-4">
-            <Text className="text-white text-2xl font-bold">🔐</Text>
-          </View>
-          <Text className="text-white text-3xl font-bold">SecureChat</Text>
-          <Text className="text-[#8B8FAE] text-sm mt-2">End-to-End Encrypted Messaging</Text>
+        <View className="mb-12">
+          <Text className="text-[#0d1c2e] text-4xl font-bold tracking-tight">Welcome Back</Text>
+          <Text className="text-[#454652] text-base mt-2">Sign in to your secure account</Text>
         </View>
 
         {/* Form */}
-        <View className="bg-[#1A1A2E] rounded-2xl p-6 mb-4">
-          <Text className="text-[#8B8FAE] text-xs uppercase tracking-widest mb-2">Email</Text>
-          <TextInput
-            className="bg-[#16213E] text-white px-4 py-3 rounded-xl mb-4"
-            placeholder="user1@test.com"
-            placeholderTextColor="#555"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <Text className="text-[#8B8FAE] text-xs uppercase tracking-widest mb-2">Password</Text>
-          <TextInput
-            className="bg-[#16213E] text-white px-4 py-3 rounded-xl mb-4"
-            placeholder="••••••••"
-            placeholderTextColor="#555"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+        <View className="mb-8">
+          <View className="mb-6">
+            <Text className="text-[#0d1c2e] text-sm font-medium mb-2">Email Address</Text>
+            <TextInput
+              className="bg-white text-[#0d1c2e] px-4 py-4 rounded-xl border border-[#c5c5d4] focus:border-[#24389c]"
+              placeholder="name@example.com"
+              placeholderTextColor="#757684"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+          
+          <View className="mb-2">
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className="text-[#0d1c2e] text-sm font-medium">Password</Text>
+              <TouchableOpacity>
+                <Text className="text-[#24389c] text-sm font-medium">Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              className="bg-white text-[#0d1c2e] px-4 py-4 rounded-xl border border-[#c5c5d4] focus:border-[#24389c]"
+              placeholder="••••••••"
+              placeholderTextColor="#757684"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
         </View>
 
         {/* Login Button */}
         <TouchableOpacity
-          className="bg-[#6C63FF] py-4 rounded-xl items-center"
+          className="bg-[#24389c] py-4 rounded-xl items-center shadow-lg shadow-indigo-200"
           onPress={handleLogin}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-white font-bold text-base">Sign In</Text>
+            <Text className="text-white font-bold text-lg">Sign In</Text>
           )}
         </TouchableOpacity>
 
-        {/* Admin Link */}
+        {/* Footer */}
+        <View className="mt-8 flex-row justify-center items-center">
+          <Text className="text-[#454652] text-sm">Don't have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text className="text-[#24389c] text-sm font-bold">Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Admin Link - Subtle */}
         <TouchableOpacity
-          className="mt-6 items-center"
+          className="mt-12 items-center"
           onPress={() => navigation.navigate('AdminLogin')}
         >
-          <Text className="text-[#6C63FF] text-sm">Admin Console →</Text>
+          <Text className="text-[#757684] text-xs uppercase tracking-widest">Admin Console</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
